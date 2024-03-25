@@ -45,8 +45,8 @@ Here, you'll find sample Terraform configurations and guidelines for setting up 
 terraform {
   required_version = ">= 1.0.0"
   backend "s3" {
-    bucket = "your-terraform-state-bucket"
-    key    = "path/to/terraform.tfstate"
+    bucket = "terraform-state-bucket"
+    key    = "terraform.tfstate"
     region = "us-east-1"
   }
 }
@@ -56,7 +56,7 @@ provider "aws" {
 }
 
 provider "google" {
-  project = "your-gcp-project-id"
+  project = "gcp-project-id"
   region  = "us-central1"
 }
 
@@ -83,7 +83,7 @@ resource "google_bigquery_dataset" "data_vault" {
 }
 
 resource "aws_s3_bucket" "gold_data" {
-  bucket = "your-gold-data-bucket-${local.account_id}"
+  bucket = "gold-data-bucket-${local.account_id}"
   acl    = "private"
 
   versioning {
@@ -154,7 +154,7 @@ resource "aws_security_group" "redshift_sg" {
     from_port   = 5439
     to_port     = 5439
     protocol    = "tcp"
-    cidr_blocks = ["your-vpc-cidr-block"]
+    cidr_blocks = ["vpc-cidr-block"]
   }
 }
 
