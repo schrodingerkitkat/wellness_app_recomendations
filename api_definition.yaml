@@ -1,0 +1,144 @@
+openapi: 3.0.3
+info:
+  title: Personalized Mental Health Recommendation API
+  description: This API delivers personalized content based on user interactions and mood tracking.
+  version: 1.0.0
+servers:
+  - url: https://api.ohm.zenden.com/v1
+paths:
+  /user/{userId}/content/recommendations:
+    get:
+      summary: Fetch personalized content recommendations
+      tags:
+        - Recommendations
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecommendationResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /user/{userId}/mood:
+    post:
+      summary: Record user's mood
+      tags:
+        - Mood Tracking
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MoodRequest'
+      responses:
+        '201':
+          description: Mood recorded successfully
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /user/{userId}/feedback:
+    post:
+      summary: Submit user feedback
+      tags:
+        - Feedback
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeedbackRequest'
+      responses:
+        '201':
+          description: Feedback submitted successfully
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    RecommendationResponse:
+      type: object
+      properties:
+        recommendations:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContentItem'
+    ContentItem:
+      type: object
+      properties:
+        contentId:
+          type: string
+        title:
+          type: string
+        contentType:
+          type: string
+        description:
+          type: string
+    MoodRequest:
+      type: object
+      required:
+        - mood
+      properties:
+        mood:
+          type: string
+          enum: [happy, sad, angry, anxious, neutral]
+    FeedbackRequest:
+      type: object
+      required:
+        - content
+      properties:
+        content:
+          type: string
+    ErrorResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://auth.ohm.zenden.com/oauth2/authorize
+          tokenUrl: https://auth.ohm.zenden.com/oauth2/token
+          scopes:
+            read: Read access to user data
+            write: Write access to user data
+security:
+  - OAuth2: [read, write]
