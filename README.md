@@ -27,6 +27,8 @@ Our goal is to develop a scalable and secure engine that delivers personalized m
 - **Data Storage**: AWS S3, Google Cloud Storage
 - **Data Processing**: Apache Airflow, PySpark
 - **Machine Learning**: PySpark MLlib, TensorFlow, PyTorch
+- **Data Architecture**: Data Vault Data Warehouse Model
+- **Data Warehouse**: Redshift and BigQuery
 - **Infrastructure**: Terraform
 - **APIs**: Custom-built RESTful services
 
