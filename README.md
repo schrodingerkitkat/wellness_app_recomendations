@@ -24,15 +24,19 @@ Our goal is to develop a scalable and secure engine that delivers personalized m
 - **APIs & Application Integration**: Providing real-time content delivery through RESTful APIs integrated with the main app.
 
 ## Technology Stack
-- **Data Storage**: AWS S3, Google Cloud Storage, Azure Blob
+- **Data Storage**: AWS S3, Google Cloud Storage
 - **Data Processing**: Apache Airflow, PySpark
 - **Machine Learning**: PySpark MLlib, TensorFlow, PyTorch
 - **Infrastructure**: Terraform
 - **APIs**: Custom-built RESTful services
 
 ## Getting Started
-This section should provide instructions on setting up the project locally, including prerequisites, installation steps, and how to run the project.
-
+**Prerequisites**
+-  Python 3.8+
+-  Apache Airflow
+-  PySpark
+-  Terraform
+-  
 ## Infrastructure Setup
 Here, you'll find sample Terraform configurations and guidelines for setting up the project infrastructure, ensuring a seamless development and deployment process.
 
