@@ -16,12 +16,35 @@ Welcome to the repository of our Personalized Mental Health Recommendation Engin
 ## Objective
 Our goal is to develop a scalable and secure engine that delivers personalized mental health and wellness content. By analyzing user interactions, mood tracking, and feedback, we predict the most impactful content for each individual user, ranging from meditations and sleep stories to music and educational resources.
 
+
 ## Components
 - **Data Ingestion and Storage**: Utilizing cloud storage solutions for raw data management, coupled with SQL/NoSQL databases for structured data.
+  - Files/Codebases:
+    - [`data_ingestion.py`](data_ingestion.py): Scripts to ingest data from various sources (APIs, databases, etc.) into the raw data storage.
+    - [`data_model.sql`](data_model.sql): SQL scripts to create tables and define schemas in the SQL/NoSQL databases.
+    - [`storage_setup.tf`](storage_setup.tf): Terraform configuration files for setting up raw data storage solutions and databases on the cloud. 
 - **ETL/ELT Pipeline**: Leveraging Apache Airflow and PySpark for robust data processing and preparation.
+  - Files/Codebases:
+    - [`etl_pipeline.py`](etl_pipeline.py): PySpark scripts to clean, transform, and aggregate raw data into a structured format suitable for analysis.
+    - [`airflow_dag.py`](airflow_dag.py): Airflow DAG definition file for scheduling and orchestrating the ETL/ELT jobs.
+    - [`data_validation.py`](data_validation.py): Scripts for data quality checks and validation post-transformation.
 - **Data Analysis & Machine Learning**: Implementing advanced models for accurate content recommendations and user insights.
+  - Files/Codebases:
+    - [`data_analysis.py`](data_analysis.py): Scripts for exploratory data analysis and generating insights from the cleaned data.
+    - [`model_training.py`](model_training.py): PySpark or Python scripts for training machine learning models, including feature engineering and hyperparameter tuning.
+    - [`model_evaluation.py`](model_evaluation.py): Scripts for evaluating the performance of the machine learning models.
+    - [`nlp_processing.py`](nlp_processing.py): Python scripts for processing and analyzing text data from user feedback using NLP techniques. 
 - **Infrastructure Management**: Automating cloud resource provisioning with Terraform to ensure scalability and security.
+  - Files/Codebases:
+    - [`infrastructure.tf`](infrastructure.tf): Main Terraform configuration files for provisioning and managing all cloud resources required for the project.
+    - [`security.tf`](security.tf): Terraform configuration files focused on security groups, roles, and policies to ensure the project's infrastructure is secure.
 - **APIs & Application Integration**: Providing real-time content delivery through RESTful APIs integrated with the main app.
+  - Files/Codebases:
+    - [`api_definition.yaml`](api_definition.yaml): OpenAPI (Swagger) specification for defining the RESTful API endpoints and request/response structures.
+    - [`api_service.py`](api_service.py): Python Flask or FastAPI application that serves the machine learning model predictions through RESTful APIs.
+dockerfile: Dockerfile for containerizing the API service.
+    - [`api_deployment.tf`](api_deployment.tf): Terraform configuration files for deploying the containerized API service to a cloud provider's managed container service (e.g., Google Cloud Run, AWS Fargate).   
+
 
 ## Technology Stack
 - **Data Storage**: AWS S3, Google Cloud Storage
