@@ -1,4 +1,4 @@
--- BigQuery and Redshift compatible SQL for Data Vault model creation
+-- unified BigQuery and Redshift compatible SQL schema for Data Vault model creation
 
 -- Hubs
 CREATE TABLE IF NOT EXISTS hub_user (
