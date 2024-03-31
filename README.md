@@ -20,8 +20,8 @@ Our goal is to develop a scalable and secure engine that delivers personalized m
 ## Components
 - **Data Ingestion and Storage**: Utilizing cloud storage solutions for raw data management, coupled with SQL/NoSQL databases for structured data.
   - Files/Codebases:
-    - [`data_ingestion.py`](data_ingestion.py): Scripts to ingest data from various sources (APIs, databases, etc.) into the raw data storage.
-    - [`data_model.sql`](data_model.sql): SQL scripts to create tables and define schemas in the SQL/NoSQL databases.
+    - [`data_ingestion.py`](data_ingestion.py): Scripts to ingest data from refined gold s3 buckets into Redshift and BigQuery.
+    - [`data_model.sql`](data_model.sql): SQL scripts to create tables and define schemas in Redshift and BigQuery using a Data Vault Model.
     - [`storage_setup.tf`](storage_setup.tf): Terraform configuration files for setting up raw data storage solutions and databases on the cloud. 
 - **ETL/ELT Pipeline**: Leveraging Apache Airflow and PySpark for robust data processing and preparation.
   - Files/Codebases:
