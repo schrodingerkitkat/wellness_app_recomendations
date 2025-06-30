@@ -1,0 +1,208 @@
+name: Security & Quality Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  PYTHON_VERSION: "3.9"
+  TERRAFORM_VERSION: "1.5.0"
+
+jobs:
+  security-scan:
+    name: Security Scanning
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for better analysis
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install security tools
+        run: |
+          pip install bandit[toml] safety semgrep
+          
+      - name: Run Bandit (Python Security Linter)
+        run: |
+          bandit -r . -f json -o bandit-report.json
+          bandit -r . --severity-level medium --confidence-level medium
+        continue-on-error: false
+
+      - name: Run Safety (Dependency Vulnerability Check)
+        run: |
+          pip freeze | safety check --json --output safety-report.json
+          pip freeze | safety check
+        continue-on-error: false
+
+      - name: Run Semgrep (SAST)
+        run: |
+          semgrep --config=auto --json --output=semgrep-report.json .
+          semgrep --config=auto --error .
+        continue-on-error: false
+
+      - name: Upload security reports
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: security-reports
+          path: |
+            bandit-report.json
+            safety-report.json
+            semgrep-report.json
+
+  terraform-security:
+    name: Terraform Security
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Install tfsec
+        run: |
+          curl -s https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install_linux.sh | bash
+          sudo mv tfsec /usr/local/bin/
+
+      - name: Install Checkov
+        run: |
+          pip install checkov
+
+      - name: Run tfsec
+        run: |
+          tfsec . --format json --out tfsec-report.json
+          tfsec . --minimum-severity MEDIUM
+        continue-on-error: false
+
+      - name: Run Checkov
+        run: |
+          checkov -d . --framework terraform --output json --output-file checkov-report.json
+          checkov -d . --framework terraform --check CKV_AWS_*
+        continue-on-error: false
+
+      - name: Upload Terraform security reports
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: terraform-security-reports
+          path: |
+            tfsec-report.json
+            checkov-report.json
+
+  code-quality:
+    name: Code Quality & Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest pytest-cov ruff mypy black isort
+
+      - name: Run Black (Code Formatting)
+        run: black --check --diff .
+
+      - name: Run isort (Import Sorting)
+        run: isort --check-only --diff .
+
+      - name: Run Ruff (Linting)
+        run: ruff check . --output-format=github
+
+      - name: Run MyPy (Type Checking)
+        run: mypy . --strict --ignore-missing-imports
+
+      - name: Run Tests with Coverage
+        run: |
+          pytest --cov=. --cov-report=xml --cov-report=html --cov-fail-under=85
+        env:
+          DATABASE_URL: sqlite:///test.db
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: true
+
+  docker-security:
+    name: Docker Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t wellness-app:${{ github.sha }} .
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'wellness-app:${{ github.sha }}'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'HIGH,CRITICAL'
+          exit-code: '1'
+
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  secrets-scan:
+    name: Secrets Detection
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run TruffleHog
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: main
+          head: HEAD
+          extra_args: --debug --only-verified
+
+  quality-gate:
+    name: Quality Gate
+    runs-on: ubuntu-latest
+    needs: [security-scan, terraform-security, code-quality, docker-security, secrets-scan]
+    if: always()
+    steps:
+      - name: Check job results
+        run: |
+          echo "Security scan: ${{ needs.security-scan.result }}"
+          echo "Terraform security: ${{ needs.terraform-security.result }}"
+          echo "Code quality: ${{ needs.code-quality.result }}"
+          echo "Docker security: ${{ needs.docker-security.result }}"
+          echo "Secrets scan: ${{ needs.secrets-scan.result }}"
+          
+          if [[ "${{ needs.security-scan.result }}" != "success" ]] || \
+             [[ "${{ needs.terraform-security.result }}" != "success" ]] || \
+             [[ "${{ needs.code-quality.result }}" != "success" ]] || \
+             [[ "${{ needs.docker-security.result }}" != "success" ]] || \
+             [[ "${{ needs.secrets-scan.result }}" != "success" ]]; then
+            echo "❌ Quality gate failed - blocking merge"
+            exit 1
+          else
+            echo "✅ Quality gate passed - ready for merge"
+          fi

@@ -11,10 +11,7 @@ provider "aws" {
   region = "us-east-1"
 }
 
-provider "google" {
-  project = "gcp-project-id"
-  region  = "us-central1"
-}
+# GCP provider moved to gcp_resources.tf
 
 data "aws_caller_identity" "current" {}
 
@@ -22,21 +19,7 @@ locals {
   account_id = data.aws_caller_identity.current.account_id
 }
 
-resource "google_bigquery_dataset" "data_vault" {
-  dataset_id                 = "data_vault"
-  location                   = "US"
-  default_table_expiration_ms = 3600000
-
-  access {
-    role          = "roles/bigquery.dataEditor"
-    special_group = "projectWriters"
-  }
-
-  access {
-    role          = "roles/bigquery.dataViewer"
-    special_group = "projectReaders"
-  }
-}
+# BigQuery dataset moved to gcp_resources.tf
 
 resource "aws_s3_bucket" "gold_data" {
   bucket = "gold-data-bucket-${local.account_id}"

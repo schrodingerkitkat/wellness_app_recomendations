@@ -49,23 +49,7 @@ resource "aws_redshift_cluster_iam_roles" "redshift_roles" {
   iam_role_arns      = [aws_iam_role.redshift_s3_access.arn]
 }
 
-data "google_project" "project" {}
-
-resource "google_project_iam_binding" "bigquery_data_viewer" {
-  project = data.google_project.project.project_id
-  role    = "roles/bigquery.dataViewer"
-  members = [
-    f"user:{user}",
-  ]
-}
-
-resource "google_bigquery_dataset_iam_binding" "data_vault_viewer" {
-  dataset_id = google_bigquery_dataset.data_vault.dataset_id
-  role       = "roles/bigquery.dataViewer"
-  members    = [
-    f"user:{user}",
-  ]
-}
+# GCP IAM resources moved to gcp_resources.tf
 
 resource "aws_iam_user" "redshift_user" {
   name = "redshift-user"

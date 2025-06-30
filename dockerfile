@@ -29,8 +29,8 @@ WORKDIR /home/appuser
 # Copy the installed packages from the builder stage
 COPY --from=builder --chown=appuser:appuser /home/appuser/.local /home/appuser/.local
 
-# Copy the application code
-COPY --chown=appuser:appuser ./api_service.py .
+# Copy the secure application code
+COPY --chown=appuser:appuser ./api_service_secure.py ./api_service.py
 
 # Set environment variables
 ENV PATH=/home/appuser/.local/bin:$PATH

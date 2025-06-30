@@ -1,3 +1,13 @@
+# ⚠️  DEPRECATED - DO NOT USE IN PRODUCTION ⚠️ 
+# This file contains CRITICAL security vulnerabilities:
+# - Hardcoded database credentials
+# - Weak authentication logic
+# - No input validation
+# - SQL injection vulnerabilities
+# 
+# USE api_service_secure.py INSTEAD
+#
+
 from fastapi import FastAPI, HTTPException, Path, Depends, status
 from fastapi.security import OAuth2PasswordBearer
 from typing import List

@@ -1,0 +1,203 @@
+Issue Type,Summary,Description,Priority,Labels,Epic Link,Story Points,Assignee,Components,Fix Version
+Story,"[HOTFIX] Migrate hardcoded secrets to AWS Secrets Manager","**Acceptance Criteria:**
+- [ ] All hardcoded credentials removed from source code
+- [ ] Database URL migrated to Secrets Manager
+- [ ] JWT secret migrated to Secrets Manager  
+- [ ] AWS credentials use IAM roles
+- [ ] All secrets rotated post-deployment
+- [ ] git-grep returns zero hardcoded secrets
+- [ ] CI SAST scan passes
+- [ ] Canary deployment connects with assumed role
+
+**Definition of Done:**
+- [ ] Code merged with passing pipeline & quality gates
+- [ ] Unit + integration tests added/updated
+- [ ] Post-deployment health-check shows green for 24h
+- [ ] Security scan shows no hardcoded credentials
+
+**Technical Notes:**
+Use scripts/migrate_secrets.py to automate migration",Critical,"security,hotfix",HOT-001,5,Platform Team,Security,2.1.0
+
+Story,"[HOTFIX] Implement proper JWT authentication","**Acceptance Criteria:**
+- [ ] JWT token validation with proper expiry check
+- [ ] 100% requests with invalid/expired tokens return 401
+- [ ] PyTest coverage for positive/negative auth paths
+- [ ] OWASP ZAP scan shows no authentication bypass
+- [ ] Rate limiting implemented (100 req/min per user)
+- [ ] Structured logging for auth events
+
+**Definition of Done:**
+- [ ] Code merged with passing pipeline & quality gates
+- [ ] Unit + integration tests achieve 85%+ coverage
+- [ ] Security penetration test passes
+- [ ] Load test confirms P95 < 200ms
+
+**Technical Notes:**
+Replace api_service.py with api_service_secure.py implementation",Critical,"security,hotfix",HOT-001,8,Backend Team,API,2.1.0
+
+Story,"[HOTFIX] Fix SQL injection vulnerability","**Acceptance Criteria:**
+- [ ] All SQL queries use parameterized statements
+- [ ] sqlmap --risk 3 --level 5 shows no vulnerabilities
+- [ ] Union-based injection strings return 0 rows
+- [ ] Database query performance maintained
+- [ ] All endpoints tested for injection vectors
+
+**Definition of Done:**
+- [ ] Code merged with passing pipeline & quality gates
+- [ ] Security audit passes with zero SQL injection findings
+- [ ] Performance regression test shows <5% impact
+- [ ] Documentation updated with secure coding guidelines
+
+**Technical Notes:**
+Use SQLAlchemy text() for parameterized queries",Critical,"security,hotfix",HOT-001,3,Backend Team,API,2.1.0
+
+Story,"[HOTFIX] Optimize ML model training performance","**Acceptance Criteria:**
+- [ ] Cross-validation time reduced by >70%
+- [ ] Online inference P95 latency <200ms
+- [ ] MLflow tracking implemented
+- [ ] Spark session cleanup prevents memory leaks
+- [ ] 24h soak test shows stable memory usage
+
+**Definition of Done:**
+- [ ] Code merged with passing pipeline & quality gates
+- [ ] Performance benchmarks documented
+- [ ] CloudWatch metrics show stable resource usage
+- [ ] Load test confirms latency targets
+
+**Technical Notes:**
+Use model_training_optimized.py with train-validation split approach",High,"performance,hotfix",HOT-001,5,Data Science Team,ML,2.1.0
+
+Epic,"Secure-by-Design Refactor","**Objective:**
+Implement comprehensive security controls across application, infrastructure, and CI/CD pipeline.
+
+**Success Metrics:**
+- Zero high-severity security findings
+- 85%+ test coverage maintained
+- All secrets externalized
+- Encryption at rest and in transit
+- Automated security scanning in CI/CD
+
+**Timeline:** Sprint 1-3 (6 weeks)
+
+**Dependencies:**
+- AWS Secrets Manager setup
+- Redis cluster for rate limiting
+- Security scanning tools integration",High,"security,refactor",SEC-001,,,Security Team,Security,2.2.0
+
+Story,"Implement OAuth 2.1 PKCE authentication flow","**Acceptance Criteria:**
+- [ ] OAuth 2.1 PKCE flow implemented
+- [ ] Short-lived access tokens (30 min)
+- [ ] Refresh token rotation
+- [ ] Token introspection endpoint
+- [ ] Client credential validation
+- [ ] Integration with external OAuth providers
+
+**Definition of Done:**
+- [ ] Code merged with passing pipeline & quality gates
+- [ ] OAuth compliance tests pass
+- [ ] Security review approved
+- [ ] Documentation updated
+
+**Technical Notes:**
+Integrate with FastAPI OAuth2 and implement PKCE challenge",Medium,"security,auth",SEC-001,8,Backend Team,Authentication,2.2.0
+
+Story,"Add comprehensive input validation with Pydantic V2","**Acceptance Criteria:**
+- [ ] All API endpoints use Pydantic models
+- [ ] Custom validators for business logic
+- [ ] Error messages don't expose internal details
+- [ ] Performance impact <10ms P95
+- [ ] Validation covers all data types
+
+**Definition of Done:**
+- [ ] Code merged with passing pipeline & quality gates
+- [ ] Validation test coverage 100%
+- [ ] API documentation auto-generated
+- [ ] Security scan passes
+
+**Technical Notes:**
+Replace ad-hoc validation with Pydantic V2 models and validators",Medium,"security,validation",SEC-001,5,Backend Team,API,2.2.0
+
+Story,"Implement structured logging with ECS format","**Acceptance Criteria:**
+- [ ] All logs in structured JSON format
+- [ ] ECS@1 specification compliance
+- [ ] Trace ID correlation across services
+- [ ] CloudWatch integration
+- [ ] Log aggregation in Datadog
+- [ ] No sensitive data in logs
+
+**Definition of Done:**
+- [ ] Code merged with passing pipeline & quality gates
+- [ ] Log parsing dashboard created
+- [ ] Alerting rules configured
+- [ ] Security review of log content
+
+**Technical Notes:**
+Use Python structlog with ECS formatter for consistent log format",Medium,"observability,security",SEC-001,3,Platform Team,Logging,2.2.0
+
+Story,"Setup automated security scanning in CI/CD","**Acceptance Criteria:**
+- [ ] SAST tools: Bandit, Semgrep, CodeQL
+- [ ] Dependency scanning: Safety, Snyk
+- [ ] Infrastructure scanning: tfsec, Checkov
+- [ ] Container scanning: Trivy
+- [ ] Quality gates block merge on high findings
+- [ ] Security reports in dashboard
+
+**Definition of Done:**
+- [ ] CI/CD pipeline includes all security scans
+- [ ] Quality gates configured and tested
+- [ ] Security dashboard deployed
+- [ ] Team trained on security workflow
+
+**Technical Notes:**
+Use .github/workflows/security-pipeline.yml as baseline configuration",High,"security,cicd",SEC-001,8,Platform Team,CI/CD,2.2.0
+
+Epic,"Long-term Security Hardening","**Objective:**
+Implement enterprise-grade security controls for production deployment including zero-trust architecture, compliance controls, and resilience measures.
+
+**Success Metrics:**
+- HIPAA compliance audit passed
+- 99.9% service availability
+- RTO <15 min, RPO <5 min
+- Zero security incidents
+- Cost optimization >30%
+
+**Timeline:** Q2-Q3 (6 months)
+
+**Dependencies:**
+- Zero-trust infrastructure
+- Compliance framework
+- Disaster recovery procedures",Medium,"security,compliance",LTS-001,,,Security Team,Compliance,3.0.0
+
+Story,"Implement mTLS for service-to-service communication","**Acceptance Criteria:**
+- [ ] SPIFFE/SPIRE identity framework
+- [ ] Automatic certificate rotation
+- [ ] 100% intra-service calls encrypted
+- [ ] Certificate authority setup
+- [ ] Monitoring and alerting for cert expiry
+- [ ] Performance impact <5ms P95
+
+**Definition of Done:**
+- [ ] mTLS enabled across all services
+- [ ] Certificate management automated  
+- [ ] Security audit passes
+- [ ] Performance regression test passes
+
+**Technical Notes:**
+Use SPIFFE/SPIRE for service identity and certificate management",Low,"security,infrastructure",LTS-001,13,Platform Team,Infrastructure,3.0.0
+
+Story,"Implement HIPAA compliance controls","**Acceptance Criteria:**
+- [ ] Data encryption at rest (KMS CMK)
+- [ ] Audit logging (CloudTrail organization-wide)
+- [ ] Access controls (RBAC + ABAC)
+- [ ] Data retention policies
+- [ ] Incident response procedures
+- [ ] Third-party BAA compliance
+
+**Definition of Done:**
+- [ ] HIPAA compliance audit passed
+- [ ] All controls documented
+- [ ] Staff training completed
+- [ ] Incident response tested
+
+**Technical Notes:**
+Focus on Redshift RA3 with HSM-backed KMS and comprehensive audit trail",High,"compliance,security",LTS-001,21,Compliance Team,Compliance,3.0.0
